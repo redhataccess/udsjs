@@ -260,7 +260,7 @@
     };
 
     uds.removeUserRole = function (userId, query) {
-        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', query);
+        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', encodeURIComponent(query));
         return executeUdsAjaxCall(url, 'DELETE');
     };
 
@@ -276,7 +276,7 @@
         if (uql == null || uql == undefined || uql === '') {
             throw 'User Query is mandatory';
         }
-        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', uql);
+        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', encodeURIComponent(uql));
             return executeUdsAjaxCallWithData(url, data, 'POST');
     };
 
