@@ -35,7 +35,7 @@ require(['uds'], function (uds) {
         console.debug("Successfully fetched case comments " + comments.length)
     }, errorFunc);
     
-    uds.makeUqlQuery('/case/comments', 'ownerId is "005A0000000zqMTIAY" AND (lastModifiedDate >= 2016-05-01 AND lastModifiedDate <= 2016-05-03)').then(function(comments) {
+    uds.fetchComments('ownerId is "005A0000000zqMTIAY" AND (lastModifiedDate >= 2016-05-01 AND lastModifiedDate <= 2016-05-03)').then(function(comments) {
         console.debug("Fetched " + comments.length + " comments via UQL and a date range.")
     }, errorFunc);
 

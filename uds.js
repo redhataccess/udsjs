@@ -445,10 +445,5 @@
         return executeUdsAjaxCall(url, 'GET');
     };
     
-    uds.makeUqlQuery = function (path, uql) {
-        var url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
-        return executeUdsAjaxCall(url, 'GET');
-    };
-
     return uds;
 }));
