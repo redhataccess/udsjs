@@ -5,7 +5,7 @@
 (function (root, factory) {
     'use strict';
     if (typeof define === 'function' && define.amd) {
-        define('uds', ['jquery', 'jsUri', 'bluebird'], factory);
+        define('uds', ['jquery', 'jsuri', 'bluebird'], factory);
     } else {
         root.uds = factory(root.$, root.Uri, root.Promise);
     }
