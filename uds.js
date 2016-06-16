@@ -416,7 +416,7 @@ export function addAdditionalContacts (caseNumber, contacts) {
     return executeUdsAjaxCallWithData(url, contacts, 'PUT');
 }
 
-export function fetchBrmsSolrQuery (jsonObject) {
+export function getBrmsResponse (jsonObject) {
     const url = udsHostName.clone().setPath('/brms');
     return executeUdsAjaxCallWithData(url, jsonObject, 'POST');
 }
