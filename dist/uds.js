@@ -129,7 +129,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.getAdditionalContacts = getAdditionalContacts;
 	    exports.removeAdditionalContacts = removeAdditionalContacts;
 	    exports.addAdditionalContacts = addAdditionalContacts;
-	    exports.fetchBrmsSolrQuery = fetchBrmsSolrQuery;
+	    exports.getBrmsResponse = getBrmsResponse;
 	    exports.fetchTopCasesFromSolr = fetchTopCasesFromSolr;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
@@ -547,7 +547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return executeUdsAjaxCallWithData(url, contacts, 'PUT');
 	    }
 
-	    function fetchBrmsSolrQuery(jsonObject) {
+	    function getBrmsResponse(jsonObject) {
 	        var url = udsHostName.clone().setPath('/brms');
 	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST');
 	    }
