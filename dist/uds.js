@@ -90,9 +90,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.fetchCaseHistory = fetchCaseHistory;
 	    exports.addAssociates = addAssociates;
 	    exports.getCQIQuestions = getCQIQuestions;
+	    exports.getCQIs = getCQIs;
 	    exports.postCQIScore = postCQIScore;
 	    exports.getSolutionDetails = getSolutionDetails;
 	    exports.getSQIQuestions = getSQIQuestions;
+	    exports.getSQIs = getSQIs;
 	    exports.postSQIScore = postSQIScore;
 	    exports.getSbrList = getSbrList;
 	    exports.fetchCaseSbrs = fetchCaseSbrs;
@@ -317,6 +319,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
+	    // Allows for UQL for fetching CQIs
+	    function getCQIs(uql) {
+	        var url = udsHostName.clone().setPath('/case/reviews').addQueryParam('where', uql);
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
 	    function postCQIScore(caseNumber, reviewData) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews');
 	        return executeUdsAjaxCallWithData(url, reviewData, 'POST');
@@ -332,6 +340,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function getSQIQuestions(solutionNumber) {
 	        var url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber + '/reviews/questions');
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    // Allows for UQL for fetching SQIs
+	    function getSQIs(uql) {
+	        var url = udsHostName.clone().setPath('/documentation/solution/reviews').addQueryParam('where', uql);
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
