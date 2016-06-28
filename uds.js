@@ -186,6 +186,12 @@ export function getCQIQuestions (caseNumber) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
+// Allows for UQL for fetching CQIs
+export function getCQIs(uql) {
+    const url = udsHostName.clone().setPath('/case/reviews').addQueryParam('where', uql);
+    return executeUdsAjaxCall(url, 'GET');
+}
+
 export function postCQIScore (caseNumber, reviewData) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews');
     return executeUdsAjaxCallWithData(url, reviewData, 'POST');
@@ -201,6 +207,12 @@ export function getSolutionDetails (solutionNumber, resourceProjection) {
 
 export function getSQIQuestions (solutionNumber) {
     const url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber + '/reviews/questions');
+    return executeUdsAjaxCall(url, 'GET');
+}
+
+// Allows for UQL for fetching SQIs
+export function getSQIs(uql) {
+    const url = udsHostName.clone().setPath('/documentation/solution/reviews').addQueryParam('where', uql);
     return executeUdsAjaxCall(url, 'GET');
 }
 

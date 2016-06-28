@@ -9,11 +9,7 @@ uds.getSbrList('Minimal', 'sbrName like "%"').then(function(sbrs) {
     console.debug("Successfully fetched " + sbrs.length + " sbrs.");
 }, errorFunc);
 
-uds.fetchCaseDetails("1332755").then(function(kase) {
-    console.debug("Successfully fetched case details for case: " + kase.resource.caseNumber);
-}, errorFunc);
-
-uds.fetchCaseDetails("1332755").then(function(kase) {
+uds.fetchCaseDetails("01324728").then(function(kase) {
     console.debug("Successfully fetched case details for case: " + kase.resource.caseNumber);
 }, errorFunc);
 
@@ -22,7 +18,18 @@ uds.fetchCaseComments("01278378").then(function(comments) {
 }, errorFunc);
 
 uds.fetchComments('ownerId is "005A0000000zqMTIAY" AND (lastModifiedDate >= 2016-05-01 AND lastModifiedDate <= 2016-05-03)').then(function(comments) {
-    console.debug("Fetched " + comments.length + " comments via UQL and a date range.")
+    var commentsLength = comments && comments.length || 0;
+    console.debug("Fetched " + commentsLength + " comments via UQL and a date range.")
+}, errorFunc);
+
+uds.getSQIs('(createdById is "005A0000004rPfFIAU" and (createdDate >= 2015-12-19 and createdDate <= 2015-12-23))').then(function(sqis) {
+    var sqisLength = sqis && sqis.length || 0;
+    console.debug("Fetched " + sqisLength + " sqis via UQL and a date range.")
+}, errorFunc);
+
+uds.getCQIs('(createdById is "005A0000004rPfFIAU" and (createdDate >= 2015-12-19 and createdDate <= 2015-12-23))').then(function(cqis) {
+    var cqisLength = cqis && cqis.length || 0;
+    console.debug("Fetched " + cqisLength + " cqis via UQL and a date range.")
 }, errorFunc);
 
 uds.fetchUserDetails("rhn-support-rmanes").then(function(user) {
