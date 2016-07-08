@@ -96,7 +96,7 @@ export function releaselock (caseNumber) {
 
 export function fetchAccountDetails (accountNumber, resourceProjection) {
 
-    const url = udsHostName.clone().setPath('/account/' + accountNumber);
+    let url = udsHostName.clone().setPath('/account/' + accountNumber);
     if (resourceProjection != null) {
         url.addQueryParam('resourceProjection', resourceProjection);
     } else {
@@ -116,7 +116,7 @@ export function fetchUserDetails (ssoUsername) {
 }
 
 export function fetchUser (userUql, resourceProjection) {
-    const url = udsHostName.clone().setPath('/user').addQueryParam('where', userUql);
+    let url = udsHostName.clone().setPath('/user').addQueryParam('where', userUql);
     if (resourceProjection != null) {
         url.addQueryParam('resourceProjection', resourceProjection);
     }
@@ -128,7 +128,7 @@ export function fetchCases (uql, resourceProjection, limit, sortOption, statusOn
     if (statusOnly) {
         path = '/case/list-status-only'
     }
-    const url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
+    let url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
     if (resourceProjection != null) {
         url.addQueryParam('resourceProjection', resourceProjection);
     } else {
@@ -157,11 +157,11 @@ export function postPublicComments (caseNumber, caseComment, hoursWorked) {
 }
 
 export function postPrivateComments (caseNumber, caseComment, hoursWorked) {
-    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private");
+    let url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private");
     if (hoursWorked === undefined) {
-        const url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private");
+        url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private");
     } else {
-        const url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private/hoursWorked/" + hoursWorked);
+        url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private/hoursWorked/" + hoursWorked);
     }
     return executeUdsAjaxCallWithData(url, caseComment, 'POST');
 }
@@ -198,7 +198,7 @@ export function postCQIScore (caseNumber, reviewData) {
 }
 
 export function getSolutionDetails (solutionNumber, resourceProjection) {
-    const url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber);
+    let url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber);
     if (resourceProjection !== undefined) {
         url.addQueryParam('resourceProjection', resourceProjection);
     }
@@ -222,7 +222,7 @@ export function postSQIScore (solutionNumber, reviewData) {
 }
 
 export function getSbrList (resourceProjection, query) {
-    const url = udsHostName.clone().setPath('/user/metadata/sbrs');
+    let url = udsHostName.clone().setPath('/user/metadata/sbrs');
     url.addQueryParam('resourceProjection', resourceProjection);
     url.addQueryParam('where', query);
     return executeUdsAjaxCall(url, 'GET');
@@ -244,7 +244,7 @@ export function removeUserSbr (userId, query) {
 }
 
 export function getRoleList (query) {
-    const url = udsHostName.clone().setPath('/user/metadata/roles');
+    let url = udsHostName.clone().setPath('/user/metadata/roles');
     url.addQueryParam('where', query);
     return executeUdsAjaxCall(url, 'GET');
 }
@@ -277,7 +277,7 @@ export function postAddUsersToRole (userId, uql, data) {
 
 export function getOpenCasesForAccount (uql) {
     const path = '/case';
-    const url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
+    let url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
     url.addQueryParam('resourceProjection', 'Minimal');
     return executeUdsAjaxCall(url, 'GET');
 }
@@ -299,7 +299,7 @@ export function postRoleLevel (userId, roleName, roleLevel) {
 }
 
 export function postEditPrivateComments (caseNumber, caseComment, caseCommentId, draft) {
-    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/private");
+    let url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/private");
     url.addQueryParam('draft', draft);
     return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
 }
@@ -350,7 +350,7 @@ export function updateCaseAssociate (caseId, jsonAssociates) {
 }
 
 export function fetchSolutionDetails (solutionIdQuery) {
-    const url = udsHostName.clone().setPath('/documentation/solution').addQueryParam('where', solutionIdQuery);
+    let url = udsHostName.clone().setPath('/documentation/solution').addQueryParam('where', solutionIdQuery);
     url.addQueryParam('resourceProjection', 'Minimal');
     return executeUdsAjaxCall(url, 'GET');
 }
@@ -363,7 +363,7 @@ export function setHandlingSystem (caseNumber, handlingSystemArray) {
 export function fetchSolr (query) {
     if (query.q === undefined || query.q === null || query.q === '') throw 'SOLR Query is mandatory';
 
-    const url = udsHostName.clone().setPath('/solr');
+    let url = udsHostName.clone().setPath('/solr');
     url.addQueryParam('wt', 'json');
     url.addQueryParam('q', query.q);
     if (query.fq !== undefined && query.fq !== '') {
@@ -393,7 +393,7 @@ export function removeCaseSbrs (caseNumber, sbrArray) {
 }
 
 export function getAllRolesList (query) {
-    const url = udsHostName.clone().setPath('/user/metadata/roles/query');
+    let url = udsHostName.clone().setPath('/user/metadata/roles/query');
     url.addQueryParam('where', query);
     return executeUdsAjaxCall(url, 'GET');
 }
