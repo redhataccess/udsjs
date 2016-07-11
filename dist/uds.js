@@ -87,6 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.postPublicComments = postPublicComments;
 	    exports.postPrivateComments = postPrivateComments;
 	    exports.updateCaseDetails = updateCaseDetails;
+	    exports.updateCaseOwner = updateCaseOwner;
 	    exports.fetchCaseHistory = fetchCaseHistory;
 	    exports.addAssociates = addAssociates;
 	    exports.getCQIQuestions = getCQIQuestions;
@@ -302,6 +303,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function updateCaseDetails(caseNumber, caseDetails) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber);
 	        return executeUdsAjaxCallWithData(url, caseDetails, 'PUT');
+	    }
+
+	    function updateCaseOwner(caseNumber, ownerSSO) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/owner/' + ownerSSO);
+	        return executeUdsAjaxCall(url, 'PUT');
 	    }
 
 	    function fetchCaseHistory(caseNumber) {
