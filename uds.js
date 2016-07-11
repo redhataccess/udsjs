@@ -171,6 +171,11 @@ export function updateCaseDetails (caseNumber, caseDetails) {
     return executeUdsAjaxCallWithData(url, caseDetails, 'PUT');
 }
 
+export function updateCaseOwner(caseNumber, ownerSSO) {
+    const url = udsHostName.clone().setPath(`/case/${caseNumber}/owner/${ownerSSO}`);
+    return executeUdsAjaxCall(url, 'PUT');
+}
+
 export function fetchCaseHistory (caseNumber) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber + "/history");
     return executeUdsAjaxCall(url, 'GET');
