@@ -442,3 +442,13 @@ export function fetchTopCasesFromSolr (queryString) {
     const url = udsHostName.clone().setPath('/solr?' + queryString);
     return executeUdsAjaxCall(url, 'GET');
 }
+
+export function getUserDetailsFromSFDC (userID) {
+    const url = udsHostName.clone().setPath('/salesforce/user/' + userID);
+    return executeUdsAjaxCall(url, 'GET');
+}
+
+export function getCallCenterFromSFDC (callCenterId) {
+    const url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
+    return executeUdsAjaxCall(url, 'GET');
+}

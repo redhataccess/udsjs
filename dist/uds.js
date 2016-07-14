@@ -134,6 +134,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.addAdditionalContacts = addAdditionalContacts;
 	    exports.getBrmsResponse = getBrmsResponse;
 	    exports.fetchTopCasesFromSolr = fetchTopCasesFromSolr;
+	    exports.getUserDetailsFromSFDC = getUserDetailsFromSFDC;
+	    exports.getCallCenterFromSFDC = getCallCenterFromSFDC;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -574,6 +576,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function fetchTopCasesFromSolr(queryString) {
 	        var url = udsHostName.clone().setPath('/solr?' + queryString);
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function getUserDetailsFromSFDC(userID) {
+	        var url = udsHostName.clone().setPath('/salesforce/user/' + userID);
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function getCallCenterFromSFDC(callCenterId) {
+	        var url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 	});
