@@ -180,22 +180,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    var executeUdsAjaxCall = function executeUdsAjaxCall(url, httpMethod) {
-	        return Promise.resolve($.ajax($.extend({}, baseAjaxParams, {
-	            url: url,
-	            type: httpMethod,
-	            method: httpMethod
-	        })));
+	        return new Promise(function (resolve, reject) {
+	            return $.ajax($.extend({}, baseAjaxParams, {
+	                url: url,
+	                type: httpMethod,
+	                method: httpMethod,
+	                success: function success(response, status, xhr) {
+	                    return resolve(xhr.status === 204 ? null : response);
+	                },
+	                error: function error(xhr, status) {
+	                    return reject(xhr);
+	                }
+	            }));
+	        });
+	        return Promise.resolve();
 	    };
 
-	    var executeUdsAjaxCallWithData = function executeUdsAjaxCallWithData(url, data, httpMethod) {
-	        return Promise.resolve($.ajax($.extend({}, baseAjaxParams, {
-	            url: url,
-	            data: JSON.stringify(data),
-	            contentType: 'application/json',
-	            type: httpMethod,
-	            method: httpMethod,
-	            dataType: ''
-	        })));
+	    var executeUdsAjaxCallWithData = function executeUdsAjaxCallWithData(url, data, httpMethod, dataType) {
+	        return new Promise(function (resolve, reject) {
+	            return $.ajax($.extend({}, baseAjaxParams, {
+	                url: url,
+	                data: JSON.stringify(data),
+	                contentType: 'application/json',
+	                type: httpMethod,
+	                method: httpMethod,
+	                dataType: dataType || '',
+	                success: function success(response, status, xhr) {
+	                    return resolve(xhr.status === 204 ? null : response);
+	                },
+	                error: function error(xhr, status) {
+	                    return reject(xhr);
+	                }
+	            }));
+	        });
 	    };
 
 	    function fetchCaseDetails(caseNumber) {
@@ -571,7 +588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function getBrmsResponse(jsonObject) {
 	        var url = udsHostName.clone().setPath('/brms');
-	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST');
+	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST', 'text');
 	    }
 
 	    function fetchTopCasesFromSolr(queryString) {

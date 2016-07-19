@@ -44,22 +44,29 @@ const baseAjaxParams = {
 };
 
 const executeUdsAjaxCall = function (url, httpMethod) {
-    return Promise.resolve($.ajax($.extend({}, baseAjaxParams, {
-        url: url,
-        type: httpMethod,
-        method: httpMethod
+    return new Promise((resolve, reject) =>
+        $.ajax($.extend({}, baseAjaxParams, {
+            url: url,
+            type: httpMethod,
+            method: httpMethod,
+            success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
+            error: (xhr, status) => reject(xhr)
     })));
+    return Promise.resolve();
 };
 
-const executeUdsAjaxCallWithData = function (url, data, httpMethod) {
-    return Promise.resolve($.ajax($.extend({}, baseAjaxParams, {
-        url: url,
-        data: JSON.stringify(data),
-        contentType: 'application/json',
-        type: httpMethod,
-        method: httpMethod,
-        dataType: ''
-    })));
+const executeUdsAjaxCallWithData = function (url, data, httpMethod, dataType) {
+    return new Promise((resolve, reject) =>
+        $.ajax($.extend({}, baseAjaxParams, {
+            url: url,
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            type: httpMethod,
+            method: httpMethod,
+            dataType: dataType || '',
+            success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
+            error: (xhr, status) => reject(xhr)
+        })));
 };
 
 export function fetchCaseDetails(caseNumber) {
@@ -435,7 +442,7 @@ export function addAdditionalContacts (caseNumber, contacts) {
 
 export function getBrmsResponse (jsonObject) {
     const url = udsHostName.clone().setPath('/brms');
-    return executeUdsAjaxCallWithData(url, jsonObject, 'POST');
+    return executeUdsAjaxCallWithData(url, jsonObject, 'POST', 'text');
 }
 
 export function fetchTopCasesFromSolr (queryString) {
