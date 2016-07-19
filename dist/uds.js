@@ -196,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return Promise.resolve();
 	    };
 
-	    var executeUdsAjaxCallWithData = function executeUdsAjaxCallWithData(url, data, httpMethod) {
+	    var executeUdsAjaxCallWithData = function executeUdsAjaxCallWithData(url, data, httpMethod, dataType) {
 	        return new Promise(function (resolve, reject) {
 	            return $.ajax($.extend({}, baseAjaxParams, {
 	                url: url,
@@ -204,7 +204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                contentType: 'application/json',
 	                type: httpMethod,
 	                method: httpMethod,
-	                dataType: '',
+	                dataType: dataType || '',
 	                success: function success(response, status, xhr) {
 	                    return resolve(xhr.status === 204 ? null : response);
 	                },
@@ -588,7 +588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function getBrmsResponse(jsonObject) {
 	        var url = udsHostName.clone().setPath('/brms');
-	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST');
+	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST', 'text');
 	    }
 
 	    function fetchTopCasesFromSolr(queryString) {
