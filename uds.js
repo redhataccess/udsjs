@@ -459,3 +459,18 @@ export function getCallCenterFromSFDC (callCenterId) {
     const url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
     return executeUdsAjaxCall(url, 'GET');
 }
+
+export function getCaseTagsList () {
+    const url = udsHostName.clone().setPath('/case/tags');
+    return executeUdsAjaxCall(url, 'GET');
+}
+
+export function addCaseTags (caseNumber, tagsArray) {
+    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
+    return executeUdsAjaxCallWithData(url, tagsArray, 'PUT');
+}
+
+export function removeCaseTags (caseNumber, tagsArray) {
+    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
+    return executeUdsAjaxCallWithData(url, tagsArray, 'DELETE');
+}
