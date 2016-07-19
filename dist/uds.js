@@ -136,6 +136,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.fetchTopCasesFromSolr = fetchTopCasesFromSolr;
 	    exports.getUserDetailsFromSFDC = getUserDetailsFromSFDC;
 	    exports.getCallCenterFromSFDC = getCallCenterFromSFDC;
+	    exports.getCaseTagsList = getCaseTagsList;
+	    exports.addCaseTags = addCaseTags;
+	    exports.removeCaseTags = removeCaseTags;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -604,6 +607,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function getCallCenterFromSFDC(callCenterId) {
 	        var url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
 	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function getCaseTagsList() {
+	        var url = udsHostName.clone().setPath('/case/tags');
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function addCaseTags(caseNumber, tagsArray) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
+	        return executeUdsAjaxCallWithData(url, tagsArray, 'PUT');
+	    }
+
+	    function removeCaseTags(caseNumber, tagsArray) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
+	        return executeUdsAjaxCallWithData(url, tagsArray, 'DELETE');
 	    }
 	});
 
