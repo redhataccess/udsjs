@@ -605,7 +605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function getCallCenterFromSFDC(callCenterId) {
-	        var url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
+	        var url = udsHostName.clone().setPath('/callcenter/' + callCenterId);
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
