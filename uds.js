@@ -456,7 +456,7 @@ export function getUserDetailsFromSFDC (userID) {
 }
 
 export function getCallCenterFromSFDC (callCenterId) {
-    const url = udsHostName.clone().setPath('/callCenterId/' + callCenterId);
+    const url = udsHostName.clone().setPath('/callcenter/' + callCenterId);
     return executeUdsAjaxCall(url, 'GET');
 }
 
