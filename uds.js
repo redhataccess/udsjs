@@ -316,6 +316,12 @@ export function postEditPrivateComments (caseNumber, caseComment, caseCommentId,
     return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
 }
 
+export function postPvtToPubComments(caseNumber, caseComment, caseCommentId, draft) {
+    var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/public");
+    url.addQueryParam('draft', draft);
+    return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
+}
+
 export function createCaseNep (caseNumber, nep) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber + "/nep");
     return executeUdsAjaxCallWithData(url, nep, 'POST');
