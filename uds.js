@@ -51,7 +51,7 @@ const executeUdsAjaxCall = function (url, httpMethod) {
             method: httpMethod,
             success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
             error: (xhr, status) => reject(xhr)
-    })));
+        })));
     return Promise.resolve();
 };
 
@@ -271,6 +271,11 @@ export function removeUserRole (userId, query) {
     return executeUdsAjaxCall(url, 'DELETE');
 }
 
+export function updateUserRole(userId, role) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/role/${role.externalModelId}`);
+    return executeUdsAjaxCallWithData(url, role.resource, 'PUT');
+}
+
 export function postAddUsersToSBR (userId, uql, data) {
     if (uql == null || uql == undefined || uql === '') {
         throw 'User Query is mandatory';
@@ -479,4 +484,10 @@ export function addCaseTags (caseNumber, tagsArray) {
 export function removeCaseTags (caseNumber, tagsArray) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
     return executeUdsAjaxCallWithData(url, tagsArray, 'DELETE');
+}
+
+export function fetchPriorityTemplates(uql) {
+    const url = udsHostName.clone().setPath('/user/metadata/templates');
+    url.addQueryParam('where', uql);
+    return executeUdsAjaxCall(url, 'GET');
 }
