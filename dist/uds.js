@@ -111,6 +111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.getQuestionDependencies = getQuestionDependencies;
 	    exports.postRoleLevel = postRoleLevel;
 	    exports.postEditPrivateComments = postEditPrivateComments;
+	    exports.postPvtToPubComments = postPvtToPubComments;
 	    exports.createCaseNep = createCaseNep;
 	    exports.updateCaseNep = updateCaseNep;
 	    exports.removeCaseNep = removeCaseNep;
@@ -461,6 +462,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function postEditPrivateComments(caseNumber, caseComment, caseCommentId, draft) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/private");
+	        url.addQueryParam('draft', draft);
+	        return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
+	    }
+
+	    function postPvtToPubComments(caseNumber, caseComment, caseCommentId, draft) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/public");
 	        url.addQueryParam('draft', draft);
 	        return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
 	    }
