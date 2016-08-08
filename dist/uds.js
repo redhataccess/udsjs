@@ -142,6 +142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.addCaseTags = addCaseTags;
 	    exports.removeCaseTags = removeCaseTags;
 	    exports.fetchPriorityTemplates = fetchPriorityTemplates;
+	    exports.fetchCaseLanguages = fetchCaseLanguages;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -641,6 +642,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function fetchPriorityTemplates(uql) {
 	        var url = udsHostName.clone().setPath('/user/metadata/templates');
 	        url.addQueryParam('where', uql);
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function fetchCaseLanguages() {
+	        var url = udsHostName.clone().setPath('/case/languages');
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 	});
