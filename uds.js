@@ -491,3 +491,8 @@ export function fetchPriorityTemplates(uql) {
     url.addQueryParam('where', uql);
     return executeUdsAjaxCall(url, 'GET');
 }
+
+export function fetchCaseLanguages() {
+    const url = udsHostName.clone().setPath('/case/languages');
+    return executeUdsAjaxCall(url, 'GET');
+}
