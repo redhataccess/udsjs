@@ -496,3 +496,15 @@ export function fetchCaseLanguages() {
     const url = udsHostName.clone().setPath('/case/languages');
     return executeUdsAjaxCall(url, 'GET');
 }
+
+export function fetchBugzillas(uql) {
+    const url = udsHostName.clone().setPath('/bug');
+    url.addQueryParam('where', uql);
+    return executeUdsAjaxCall(url, 'GET');
+}
+
+export function fetchBugzillaComments(uql) {
+    const url = udsHostName.clone().setPath('/bug/comments');
+    url.addQueryParam('where', uql);
+    return executeUdsAjaxCall(url, 'GET');
+}

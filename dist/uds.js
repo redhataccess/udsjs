@@ -143,6 +143,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.removeCaseTags = removeCaseTags;
 	    exports.fetchPriorityTemplates = fetchPriorityTemplates;
 	    exports.fetchCaseLanguages = fetchCaseLanguages;
+	    exports.fetchBugzillas = fetchBugzillas;
+	    exports.fetchBugzillaComments = fetchBugzillaComments;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -647,6 +649,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function fetchCaseLanguages() {
 	        var url = udsHostName.clone().setPath('/case/languages');
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function fetchBugzillas(uql) {
+	        var url = udsHostName.clone().setPath('/bug');
+	        url.addQueryParam('where', uql);
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function fetchBugzillaComments(uql) {
+	        var url = udsHostName.clone().setPath('/bug/comments');
+	        url.addQueryParam('where', uql);
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 	});

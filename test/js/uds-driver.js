@@ -54,6 +54,16 @@ uds.updateCaseDetails(
     console.debug("Updated case.");
 }, errorFunc);
 
+uds.fetchBugzillas('((createdDate >= 2015-02-09 and createdDate <= 2015-06-16) and (loginName is "ggainey@redhat.com"))').then(function(bzs) {
+    var bzsLen = bzs && bzs.length || 0;
+    console.debug("Fetched " + bzsLen + " bugzillas created via UQL and a date range.")
+}, errorFunc);
+
+uds.fetchBugzillaComments('((commentDate >= 2016-01-01 and commentDate <= 2016-07-01) and (loginName is "msw@redhat.com"))').then(function(bzs) {
+    var bzsLen = bzs && bzs.length || 0;
+    console.debug("Fetched " + bzsLen + " bugzilla comments via UQL and a date range.")
+}, errorFunc);
+
 // Unclear right now what the UQL for this one is
 // uds.fetchCaseAssociateDetails('005A0000005n18tIAA').then(function() {
 //    
