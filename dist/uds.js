@@ -145,6 +145,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.fetchCaseLanguages = fetchCaseLanguages;
 	    exports.fetchBugzillas = fetchBugzillas;
 	    exports.fetchBugzillaComments = fetchBugzillaComments;
+	    exports.addLanguageToUser = addLanguageToUser;
+	    exports.removeLanguagesFromUser = removeLanguagesFromUser;
+	    exports.addTagToUser = addTagToUser;
+	    exports.removeTagsFromUser = removeTagsFromUser;
+	    exports.addUserAsQB = addUserAsQB;
+	    exports.removeUserQBs = removeUserQBs;
+	    exports.addNNOToUser = addNNOToUser;
+	    exports.removeNNOsFromUser = removeNNOsFromUser;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -662,6 +670,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var url = udsHostName.clone().setPath('/bug/comments');
 	        url.addQueryParam('where', uql);
 	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function addLanguageToUser(userId, language, type) {
+	        if (type !== "primary" && type !== "secondary") type = "primary";
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/language/' + type + '/' + language);
+	        return executeUdsAjaxCall(url, 'POST');
+	    }
+
+	    function removeLanguagesFromUser(userId, query) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/language').addQueryParam('where', query);
+	        return executeUdsAjaxCall(url, 'DELETE');
+	    }
+
+	    function addTagToUser(userId, tagName) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/tag/' + tagName);
+	        return executeUdsAjaxCall(url, 'POST');
+	    }
+
+	    function removeTagsFromUser(userId, query) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/tag').addQueryParam('where', query);
+	        return executeUdsAjaxCall(url, 'DELETE');
+	    }
+
+	    function addUserAsQB(qbUserId, userId) {
+	        var url = udsHostName.clone().setPath('/user/' + qbUserId + '/queuebuddy/' + userId);
+	        return executeUdsAjaxCall(url, 'POST');
+	    }
+
+	    function removeUserQBs(qbUserId, query) {
+	        var url = udsHostName.clone().setPath('/user/' + qbUserId + '/queuebuddy').addQueryParam('where', query);
+	        return executeUdsAjaxCall(url, 'DELETE');
+	    }
+
+	    function addNNOToUser(userId, nnoRegion) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion/' + nnoRegion);
+	        executeUdsAjaxCall(url, 'POST');
+	    }
+
+	    function removeNNOsFromUser(userId, query) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion').addQueryParam('where', query);
+	        return executeUdsAjaxCall(url, 'DELETE');
 	    }
 	});
 

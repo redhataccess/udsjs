@@ -508,3 +508,49 @@ export function fetchBugzillaComments(uql) {
     url.addQueryParam('where', uql);
     return executeUdsAjaxCall(url, 'GET');
 }
+
+
+export function addLanguageToUser(userId, language, type) {
+    if(type !== "primary" && type !== "secondary") type = "primary";
+    const url = udsHostName.clone().setPath(`/user/${userId}/language/${type}/${language}`);
+    return executeUdsAjaxCall(url, 'POST');
+}
+
+export function removeLanguagesFromUser(userId, query) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/language`)
+        .addQueryParam('where', query);
+    return executeUdsAjaxCall(url, 'DELETE');
+}
+
+export function addTagToUser(userId, tagName) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/tag/${tagName}`);
+    return executeUdsAjaxCall(url, 'POST');
+}
+
+export function removeTagsFromUser(userId, query) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/tag`)
+        .addQueryParam('where', query);
+    return executeUdsAjaxCall(url, 'DELETE');
+}
+
+export function addUserAsQB(qbUserId, userId) {
+    const url = udsHostName.clone().setPath(`/user/${qbUserId}/queuebuddy/${userId}`);
+    return executeUdsAjaxCall(url, 'POST');
+}
+
+export function removeUserQBs(qbUserId, query) {
+    const url = udsHostName.clone().setPath(`/user/${qbUserId}/queuebuddy`)
+        .addQueryParam('where', query);
+    return executeUdsAjaxCall(url, 'DELETE');
+}
+
+export function addNNOToUser(userId, nnoRegion) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/nnoregion/${nnoRegion}`);
+    executeUdsAjaxCall(url, 'POST');
+}
+
+export function removeNNOsFromUser(userId, query) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/nnoregion`)
+        .addQueryParam('where', query);
+    return executeUdsAjaxCall(url, 'DELETE');
+}
