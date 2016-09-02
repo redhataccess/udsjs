@@ -155,10 +155,13 @@ export function generateBomgarSessionKey (caseId) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
-export function postPublicComments (caseNumber, caseComment, hoursWorked) {
+export function postPublicComments (caseNumber, caseComment, doNotChangeSbt, hoursWorked) {
     let url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/public");
     if (hoursWorked !== undefined) {
         url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/public/hoursWorked/" + hoursWorked);
+    }
+    if (doNotChangeSbt) {
+        url.addQueryParam('doNotChangeSbt', doNotChangeSbt);
     }
     return executeUdsAjaxCallWithData(url, caseComment, 'POST');
 }
