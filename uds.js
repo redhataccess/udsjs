@@ -387,22 +387,50 @@ export function setHandlingSystem (caseNumber, handlingSystemArray) {
 }
 
 export function fetchSolr (query) {
-    if (query.q === undefined || query.q === null || query.q === '') throw 'SOLR Query is mandatory';
+    if (query.q == null || query.q === '') throw 'SOLR Query is mandatory';
 
     let url = udsHostName.clone().setPath('/solr');
     url.addQueryParam('wt', 'json');
     url.addQueryParam('q', query.q);
-    if (query.fq !== undefined && query.fq !== '') {
+    if (query.fq != null && query.fq !== '') {
         url.addQueryParam('fq', query.fq);
     }
-    if (query.start !== undefined) {
+    if (query.start != null) {
         url.addQueryParam('start', query.start);
     }
-    if (query.rows !== undefined) {
+    if (query.rows != null) {
         url.addQueryParam('rows', query.rows);
     }
-    if (query.sort !== undefined && query.sort !== '') {
+    if (query.sort != null && query.sort !== '') {
         url.addQueryParam('sort', query.sort);
+    }
+    if (query.fl != null && query.fl !== '') {
+        url.addQueryParam('fl', query.fl);
+    }
+
+    return executeUdsAjaxCall(url, 'GET');
+}
+
+export function fetchCaseSolr(query) {
+    if (query.q == null || query.q === '') throw 'SOLR Query is mandatory';
+
+    let url = udsHostName.clone().setPath('/solr/cases');
+    url.addQueryParam('wt', 'json');
+    url.addQueryParam('q', query.q);
+    if (query.fq != null && query.fq !== '') {
+        url.addQueryParam('fq', query.fq);
+    }
+    if (query.start != null) {
+        url.addQueryParam('start', query.start);
+    }
+    if (query.rows != null) {
+        url.addQueryParam('rows', query.rows);
+    }
+    if (query.sort != null && query.sort !== '') {
+        url.addQueryParam('sort', query.sort);
+    }
+    if (query.fl != null && query.fl !== '') {
+        url.addQueryParam('fl', query.fl);
     }
 
     return executeUdsAjaxCall(url, 'GET');
