@@ -138,6 +138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.getBrmsResponse = getBrmsResponse;
 	    exports.fetchTopCasesFromSolr = fetchTopCasesFromSolr;
 	    exports.getUserDetailsFromSFDC = getUserDetailsFromSFDC;
+	    exports.updateUserDetailsInSFDC = updateUserDetailsInSFDC;
 	    exports.getCallCenterFromSFDC = getCallCenterFromSFDC;
 	    exports.getCaseTagsList = getCaseTagsList;
 	    exports.addCaseTags = addCaseTags;
@@ -659,6 +660,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function getUserDetailsFromSFDC(userID) {
 	        var url = udsHostName.clone().setPath('/salesforce/user/' + userID);
 	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    function updateUserDetailsInSFDC(ssoUsername, data) {
+	        var url = udsHostName.clone().setPath('/user/salesforce/' + ssoUsername);
+	        return executeUdsAjaxCallWithData(url, data, 'PUT');
 	    }
 
 	    function getCallCenterFromSFDC(callCenterId) {

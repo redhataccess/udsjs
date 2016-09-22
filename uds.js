@@ -497,6 +497,11 @@ export function getUserDetailsFromSFDC (userID) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
+export function updateUserDetailsInSFDC(ssoUsername,data) {
+    const url = udsHostName.clone().setPath('/user/salesforce/'+ssoUsername);
+    return executeUdsAjaxCallWithData(url, data, 'PUT');
+}
+
 export function getCallCenterFromSFDC (callCenterId) {
     const url = udsHostName.clone().setPath('/callcenter/' + callCenterId);
     return executeUdsAjaxCall(url, 'GET');
