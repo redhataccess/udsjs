@@ -155,6 +155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.removeUserQBs = removeUserQBs;
 	    exports.addNNOToUser = addNNOToUser;
 	    exports.removeNNOsFromUser = removeNNOsFromUser;
+	    exports.setGbdSuperRegion = setGbdSuperRegion;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -749,6 +750,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function removeNNOsFromUser(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion').addQueryParam('where', query);
 	        return executeUdsAjaxCall(url, 'DELETE');
+	    }
+
+	    function setGbdSuperRegion(userId, value) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/virtualoffice/' + value);
+	        return executeUdsAjaxCall(url, 'PUT');
 	    }
 	});
 
