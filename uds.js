@@ -590,3 +590,8 @@ export function removeNNOsFromUser(userId, query) {
         .addQueryParam('where', query);
     return executeUdsAjaxCall(url, 'DELETE');
 }
+
+export function setGbdSuperRegion(userId, value) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/virtualoffice/${value}`);
+    return executeUdsAjaxCall(url, 'PUT');
+}
