@@ -296,12 +296,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
-	    function fetchCases(uql, resourceProjection, limit, sortOption, statusOnly) {
+	    function fetchCases(uql, resourceProjection, limit, sortOption, statusOnly, nepUql) {
 	        var path = '/case';
 	        if (statusOnly) {
 	            path = '/case/list-status-only';
 	        }
 	        var url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
+	        if (nepUql != null) {
+	            url.addQueryParam('nepWhere', nepUql);
+	        }
 	        if (resourceProjection != null) {
 	            url.addQueryParam('resourceProjection', resourceProjection);
 	        } else {

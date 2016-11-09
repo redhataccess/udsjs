@@ -130,12 +130,15 @@ export function fetchUser (userUql, resourceProjection) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
-export function fetchCases (uql, resourceProjection, limit, sortOption, statusOnly) {
+export function fetchCases (uql, resourceProjection, limit, sortOption, statusOnly, nepUql) {
     let path = '/case';
     if (statusOnly) {
         path = '/case/list-status-only'
     }
     let url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
+    if (nepUql != null) {
+        url.addQueryParam('nepWhere', nepUql);
+    }
     if (resourceProjection != null) {
         url.addQueryParam('resourceProjection', resourceProjection);
     } else {
