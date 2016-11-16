@@ -598,3 +598,8 @@ export function setGbdSuperRegion(userId, value) {
     const url = udsHostName.clone().setPath(`/user/${userId}/virtualoffice/${value}`);
     return executeUdsAjaxCall(url, 'PUT');
 }
+
+export function setOutOfOfficeflag(userId, value) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/out-of-office`);
+    return executeUdsAjaxCallWithData(url, value, 'POST');
+}
