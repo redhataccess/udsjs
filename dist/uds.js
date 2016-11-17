@@ -156,6 +156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.addNNOToUser = addNNOToUser;
 	    exports.removeNNOsFromUser = removeNNOsFromUser;
 	    exports.setGbdSuperRegion = setGbdSuperRegion;
+	    exports.setOutOfOfficeflag = setOutOfOfficeflag;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
@@ -758,6 +759,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function setGbdSuperRegion(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/virtualoffice/' + value);
 	        return executeUdsAjaxCall(url, 'PUT');
+	    }
+
+	    function setOutOfOfficeflag(userId, value) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/out-of-office');
+	        return executeUdsAjaxCallWithData(url, value, 'POST');
 	    }
 	});
 
