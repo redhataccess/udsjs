@@ -124,6 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.updateCaseAssociate = updateCaseAssociate;
 	    exports.fetchSolutionDetails = fetchSolutionDetails;
 	    exports.setHandlingSystem = setHandlingSystem;
+	    exports.fetchKCSFromDrupal = fetchKCSFromDrupal;
 	    exports.fetchSolr = fetchSolr;
 	    exports.fetchCaseSolr = fetchCaseSolr;
 	    exports.addCaseSbrs = addCaseSbrs;
@@ -554,6 +555,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function setHandlingSystem(caseNumber, handlingSystemArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/handlingsystems");
 	        return executeUdsAjaxCallWithData(url, handlingSystemArray, 'PUT');
+	    }
+
+	    function fetchKCSFromDrupal(id) {
+	        var url = udsHostName.clone().setPath('/documentation/drupalapi/' + id);
+	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
 	    function fetchSolr(query) {

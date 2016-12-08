@@ -389,6 +389,11 @@ export function setHandlingSystem (caseNumber, handlingSystemArray) {
     return executeUdsAjaxCallWithData(url, handlingSystemArray, 'PUT');
 }
 
+export function fetchKCSFromDrupal(id) {
+    const url = udsHostName.clone().setPath('/documentation/drupalapi/' + id);
+    return executeUdsAjaxCall(url, 'GET');
+}
+
 export function fetchSolr (query) {
     if (query.q == null || query.q === '') throw 'SOLR Query is mandatory';
 
