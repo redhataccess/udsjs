@@ -608,3 +608,8 @@ export function setOutOfOfficeflag(userId, value) {
     const url = udsHostName.clone().setPath(`/user/${userId}/out-of-office`);
     return executeUdsAjaxCallWithData(url, value, 'POST');
 }
+
+export function updateResourceLink(caseNumber, resourceLink) {
+    const url = udsHostName.clone().setPath(`/case/${caseNumber}/resourcelink`);
+    return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
+}
