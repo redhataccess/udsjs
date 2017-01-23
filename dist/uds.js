@@ -755,7 +755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function addNNOToUser(userId, nnoRegion) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion/' + nnoRegion);
-	        executeUdsAjaxCall(url, 'POST');
+	        return executeUdsAjaxCall(url, 'POST');
 	    }
 
 	    function removeNNOsFromUser(userId, query) {
