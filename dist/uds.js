@@ -89,7 +89,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.updateCaseDetails = updateCaseDetails;
 	    exports.updateCaseOwner = updateCaseOwner;
 	    exports.fetchCaseHistory = fetchCaseHistory;
-	    exports.addAssociates = addAssociates;
 	    exports.getCQIQuestions = getCQIQuestions;
 	    exports.getCQIs = getCQIs;
 	    exports.postCQIScore = postCQIScore;
@@ -120,6 +119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.getCaseContactsForAccount = getCaseContactsForAccount;
 	    exports.getCaseGroupsForContact = getCaseGroupsForContact;
 	    exports.getRMECountForAccount = getRMECountForAccount;
+	    exports.addAssociates = addAssociates;
 	    exports.deleteAssociates = deleteAssociates;
 	    exports.updateCaseAssociate = updateCaseAssociate;
 	    exports.fetchSolutionDetails = fetchSolutionDetails;
@@ -363,11 +363,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
-	    function addAssociates(caseId, jsonAssociates) {
-	        var url = udsHostName.clone().setPath('/case/' + caseId + "/associate");
-	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'POST');
-	    }
-
 	    function getCQIQuestions(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews/questions');
 	        return executeUdsAjaxCall(url, 'GET');
@@ -537,9 +532,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
-	    function deleteAssociates(caseId, associateId) {
-	        var url = udsHostName.clone().setPath('/case/' + caseId + '/associate/' + associateId);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	    function addAssociates(caseNumber, jsonAssociates) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
+	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'POST');
+	    }
+
+	    function deleteAssociates(caseNumber, jsonAssociates) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
+	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'DELETE');
 	    }
 
 	    function updateCaseAssociate(caseId, jsonAssociates) {
