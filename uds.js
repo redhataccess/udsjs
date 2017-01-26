@@ -194,11 +194,6 @@ export function fetchCaseHistory (caseNumber) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
-export function addAssociates (caseId, jsonAssociates) {
-    const url = udsHostName.clone().setPath('/case/' + caseId + "/associate");
-    return executeUdsAjaxCallWithData(url, jsonAssociates, 'POST');
-}
-
 export function getCQIQuestions (caseNumber) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews/questions');
     return executeUdsAjaxCall(url, 'GET');
@@ -368,9 +363,14 @@ export function getRMECountForAccount (uql) {
     return executeUdsAjaxCall(url, 'GET');
 }
 
-export function deleteAssociates (caseId, associateId) {
-    const url = udsHostName.clone().setPath('/case/' + caseId + '/associate/' + associateId);
-    return executeUdsAjaxCall(url, 'DELETE');
+export function addAssociates (caseNumber, jsonAssociates) {
+    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
+    return executeUdsAjaxCallWithData(url, jsonAssociates, 'POST');
+}
+
+export function deleteAssociates (caseNumber, jsonAssociates) {
+    const url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
+    return executeUdsAjaxCallWithData(url, jsonAssociates, 'DELETE');
 }
 
 export function updateCaseAssociate (caseId, jsonAssociates) {
