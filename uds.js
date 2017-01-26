@@ -373,11 +373,6 @@ export function deleteAssociates (caseNumber, jsonAssociates) {
     return executeUdsAjaxCallWithData(url, jsonAssociates, 'DELETE');
 }
 
-export function updateCaseAssociate (caseId, jsonAssociates) {
-    const url = udsHostName.clone().setPath('/case/' + caseId + "/associate");
-    return executeUdsAjaxCallWithData(url, jsonAssociates, 'PUT');
-}
-
 export function fetchSolutionDetails (solutionIdQuery) {
     let url = udsHostName.clone().setPath('/documentation/solution').addQueryParam('where', solutionIdQuery);
     url.addQueryParam('resourceProjection', 'Minimal');
