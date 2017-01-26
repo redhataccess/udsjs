@@ -590,7 +590,7 @@ export function removeUserQBs(qbUserId, query) {
 
 export function addNNOToUser(userId, nnoRegion) {
     const url = udsHostName.clone().setPath(`/user/${userId}/nnoregion/${nnoRegion}`);
-    executeUdsAjaxCall(url, 'POST');
+    return executeUdsAjaxCall(url, 'POST');
 }
 
 export function removeNNOsFromUser(userId, query) {
