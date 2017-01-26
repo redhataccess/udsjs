@@ -121,7 +121,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.getRMECountForAccount = getRMECountForAccount;
 	    exports.addAssociates = addAssociates;
 	    exports.deleteAssociates = deleteAssociates;
-	    exports.updateCaseAssociate = updateCaseAssociate;
 	    exports.fetchSolutionDetails = fetchSolutionDetails;
 	    exports.setHandlingSystem = setHandlingSystem;
 	    exports.fetchKCSFromDrupal = fetchKCSFromDrupal;
@@ -540,11 +539,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function deleteAssociates(caseNumber, jsonAssociates) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
 	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'DELETE');
-	    }
-
-	    function updateCaseAssociate(caseId, jsonAssociates) {
-	        var url = udsHostName.clone().setPath('/case/' + caseId + "/associate");
-	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'PUT');
 	    }
 
 	    function fetchSolutionDetails(solutionIdQuery) {
