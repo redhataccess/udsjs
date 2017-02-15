@@ -160,16 +160,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.updateResourceLink = updateResourceLink;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
-	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com') {
+	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com' || window.location.hostname === 'skedge.redhat.com') {
 	        udsHostName = new Uri('https://unified-ds.gsslab.rdu2.redhat.com/');
 	    } else {
-	        if (window.location.hostname === 'access.qa.redhat.com' || window.location.hostname === 'qa.foo.redhat.com' || window.location.hostname === 'fooqa.redhat.com') {
+	        if (window.location.hostname === 'access.qa.redhat.com' || window.location.hostname === 'qa.foo.redhat.com' || window.location.hostname === 'fooqa.redhat.com' || window.location.hostname === 'skedge.qa.redhat.com') {
 	            udsHostName = new Uri('https://unified-ds-qa.gsslab.pnq2.redhat.com/');
 	        } else {
-	            if (window.location.hostname === 'access.devgssci.devlab.phx1.redhat.com' || window.location.hostname === 'ci.foo.redhat.com' || window.location.hostname === 'fooci.redhat.com') {
+	            if (window.location.hostname === 'access.devgssci.devlab.phx1.redhat.com' || window.location.hostname === 'ci.foo.redhat.com' || window.location.hostname === 'fooci.redhat.com' || window.location.hostname === 'skedge.ci.redhat.com') {
 	                udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 	            } else {
-	                if (window.location.hostname === 'access.stage.redhat.com' || window.location.hostname === 'stage.foo.redhat.com' || window.location.hostname === 'foostage.redhat.com') {
+	                if (window.location.hostname === 'access.stage.redhat.com' || window.location.hostname === 'stage.foo.redhat.com' || window.location.hostname === 'foostage.redhat.com' || window.location.hostname === 'skedge.stage.redhat.com') {
 	                    udsHostName = new Uri('https://unified-ds-stage.gsslab.pnq2.redhat.com/');
 	                }
 	            }
