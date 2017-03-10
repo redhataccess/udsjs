@@ -608,3 +608,8 @@ export function updateResourceLink(caseNumber, resourceLink) {
     const url = udsHostName.clone().setPath(`/case/${caseNumber}/resourcelink`);
     return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
 }
+
+export function updateNightShiftForUser(userId, value) {
+    const url = udsHostName.clone().setPath(`/user/${userId}/nightshift/${value}`);
+    return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
+}
