@@ -611,5 +611,5 @@ export function updateResourceLink(caseNumber, resourceLink) {
 
 export function updateNightShiftForUser(userId, value) {
     const url = udsHostName.clone().setPath(`/user/${userId}/nightshift/${value}`);
-    return executeUdsAjaxCallWithData(url, 'PUT');
+    return executeUdsAjaxCall(url, 'PUT');
 }
