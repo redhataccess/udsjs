@@ -775,7 +775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function updateNightShiftForUser(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nightshift/' + value);
-	        return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
+	        return executeUdsAjaxCallWithData(url, 'PUT');
 	    }
 	});
 
