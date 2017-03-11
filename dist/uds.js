@@ -158,6 +158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.setGbdSuperRegion = setGbdSuperRegion;
 	    exports.setOutOfOfficeflag = setOutOfOfficeflag;
 	    exports.updateResourceLink = updateResourceLink;
+	    exports.updateNightShiftForUser = updateNightShiftForUser;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com' || window.location.hostname === 'skedge.redhat.com') {
@@ -770,6 +771,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function updateResourceLink(caseNumber, resourceLink) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/resourcelink');
 	        return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
+	    }
+
+	    function updateNightShiftForUser(userId, value) {
+	        var url = udsHostName.clone().setPath('/user/' + userId + '/nightshift/' + value);
+	        return executeUdsAjaxCall(url, 'PUT');
 	    }
 	});
 
