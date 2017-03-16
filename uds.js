@@ -613,3 +613,8 @@ export function updateNightShiftForUser(userId, value) {
     const url = udsHostName.clone().setPath(`/user/${userId}/nightshift/${value}`);
     return executeUdsAjaxCall(url, 'PUT');
 }
+
+export function updateCaseAttachment(caseNumber, attachmentId, attachmentDetails) {
+    const url = udsHostName.clone().setPath(`/case/${caseNumber}/attachment/${attachmentId}`);
+    return executeUdsAjaxCallWithData(url, attachmentDetails, 'PUT');
+}
