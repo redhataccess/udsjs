@@ -159,6 +159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.setOutOfOfficeflag = setOutOfOfficeflag;
 	    exports.updateResourceLink = updateResourceLink;
 	    exports.updateNightShiftForUser = updateNightShiftForUser;
+	    exports.updateCaseAttachment = updateCaseAttachment;
 	    var udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 	    if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com' || window.location.hostname === 'skedge.redhat.com') {
@@ -776,6 +777,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function updateNightShiftForUser(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nightshift/' + value);
 	        return executeUdsAjaxCall(url, 'PUT');
+	    }
+
+	    function updateCaseAttachment(caseNumber, attachmentId, attachmentDetails) {
+	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/attachment/' + attachmentId);
+	        return executeUdsAjaxCallWithData(url, attachmentDetails, 'PUT');
 	    }
 	});
 
