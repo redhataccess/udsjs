@@ -1,5 +1,7 @@
 'use strict';
 
+const Uri = require('jsuri');
+
 let udsHostName = new Uri('https://unified-ds-ci.gsslab.brq.redhat.com/');
 
 if (window.location.hostname === 'access.redhat.com' || window.location.hostname === 'prod.foo.redhat.com' || window.location.hostname === 'fooprod.redhat.com' || window.location.hostname === 'skedge.redhat.com') {
