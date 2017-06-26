@@ -98,6 +98,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.postSQIScore = postSQIScore;
 	    exports.getSbrList = getSbrList;
 	    exports.fetchCaseSbrs = fetchCaseSbrs;
+	    exports.fetchCaseSbrsExternal = fetchCaseSbrsExternal;
 	    exports.pinSolutionToCase = pinSolutionToCase;
 	    exports.removeUserSbr = removeUserSbr;
 	    exports.getRoleList = getRoleList;
@@ -415,6 +416,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function fetchCaseSbrs() {
 	        var url = udsHostName.clone().setPath('/case/sbrs');
+	        return executeUdsAjaxCall(url, 'GET');
+	    }
+
+	    // Unauthed sbrs
+	    function fetchCaseSbrsExternal() {
+	        var url = udsHostName.clone().setPath('/external/case/sbrs');
 	        return executeUdsAjaxCall(url, 'GET');
 	    }
 
