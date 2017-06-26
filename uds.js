@@ -57,6 +57,21 @@ const executeUdsAjaxCall = function (url, httpMethod) {
     return Promise.resolve();
 };
 
+const executeUdsAjaxCallUnAuthed = function (url, httpMethod) {
+    return new Promise((resolve, reject) =>
+        $.ajax($.extend({}, baseAjaxParams, {
+            url: url,
+            type: httpMethod,
+            method: httpMethod,
+            xhrFields: {
+                withCredentials: false
+            },
+            success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
+            error: (xhr, status) => reject(xhr)
+        })));
+    return Promise.resolve();
+};
+
 const executeUdsAjaxCallWithData = function (url, data, httpMethod, dataType) {
     return new Promise((resolve, reject) =>
         $.ajax($.extend({}, baseAjaxParams, {
@@ -251,7 +266,7 @@ export function fetchCaseSbrs () {
 // Unauthed sbrs
 export function fetchCaseSbrsExternal () {
     const url = udsHostName.clone().setPath('/external/case/sbrs');
-    return executeUdsAjaxCall(url, 'GET');
+    return executeUdsAjaxCallUnAuthed(url, 'GET');
 }
 
 export function pinSolutionToCase (caseNumber, solutionJson) {
