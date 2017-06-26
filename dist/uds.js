@@ -223,6 +223,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return Promise.resolve();
 	    };
 
+	    var executeUdsAjaxCallUnAuthed = function executeUdsAjaxCallUnAuthed(url, httpMethod) {
+	        return new Promise(function (resolve, reject) {
+	            return $.ajax($.extend({}, baseAjaxParams, {
+	                url: url,
+	                type: httpMethod,
+	                method: httpMethod,
+	                xhrFields: {
+	                    withCredentials: false
+	                },
+	                success: function success(response, status, xhr) {
+	                    return resolve(xhr.status === 204 ? null : response);
+	                },
+	                error: function error(xhr, status) {
+	                    return reject(xhr);
+	                }
+	            }));
+	        });
+	        return Promise.resolve();
+	    };
+
 	    var executeUdsAjaxCallWithData = function executeUdsAjaxCallWithData(url, data, httpMethod, dataType) {
 	        return new Promise(function (resolve, reject) {
 	            return $.ajax($.extend({}, baseAjaxParams, {
@@ -422,7 +442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Unauthed sbrs
 	    function fetchCaseSbrsExternal() {
 	        var url = udsHostName.clone().setPath('/external/case/sbrs');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallUnAuthed(url, 'GET');
 	    }
 
 	    function pinSolutionToCase(caseNumber, solutionJson) {
