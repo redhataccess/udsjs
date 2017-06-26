@@ -248,6 +248,12 @@ export function fetchCaseSbrs () {
     return executeUdsAjaxCall(url, 'GET');
 }
 
+// Unauthed sbrs
+export function fetchCaseSbrsExternal () {
+    const url = udsHostName.clone().setPath('/external/case/sbrs');
+    return executeUdsAjaxCall(url, 'GET');
+}
+
 export function pinSolutionToCase (caseNumber, solutionJson) {
     const url = udsHostName.clone().setPath('/case/' + caseNumber);
     return executeUdsAjaxCallWithData(url, solutionJson, 'PUT');
