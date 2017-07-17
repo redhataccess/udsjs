@@ -51,6 +51,12 @@ const executeUdsAjaxCall = function (url, httpMethod) {
             url: url,
             type: httpMethod,
             method: httpMethod,
+            beforeSend: function(xhr) {
+                // xhr.setRequestHeader('X-Omit', 'WWW-Authenticate');
+                if(window.sessionjs && window.sessionjs.isAuthenticated() && window.sessionjs._state.keycloak.token) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + window.sessionjs._state.keycloak.token);
+                }
+            },
             success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
             error: (xhr, status) => reject(xhr)
         })));
@@ -80,6 +86,12 @@ const executeUdsAjaxCallWithData = function (url, data, httpMethod, dataType) {
             contentType: 'application/json',
             type: httpMethod,
             method: httpMethod,
+            beforeSend: function(xhr) {
+                // xhr.setRequestHeader('X-Omit', 'WWW-Authenticate');
+                if(window.sessionjs && window.sessionjs.isAuthenticated() && window.sessionjs._state.keycloak.token) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + window.sessionjs._state.keycloak.token);
+                }
+            },
             dataType: dataType || '',
             success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
             error: (xhr, status) => reject(xhr)
