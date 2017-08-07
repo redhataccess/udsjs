@@ -206,21 +206,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dataType: ''
 	    };
 
+	    // If the token is expiring within 5 seconds, go ahead and refresh it.  Using 5 seconds as that is what keycloak uses as the default minValidity
+	    function isTokenExpired() {
+	        return window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(5) === true;
+	    }
+
+	    function forceTokenRefresh() {
+	        console.warn('Udsjs detected the JWT token has expired, forcing an update');
+	        // -1 here forces the token to refresh
+	        return window.sessionjs._state.keycloak.updateToken(-1);
+	    }
+
+	    function getToken() {
+	        if (window.sessionjs && window.sessionjs._state.keycloak.token) {
+	            if (window.sessionjs.isAuthenticated()) {
+	                return 'Bearer ' + window.sessionjs._state.keycloak.token;
+	            } else {
+	                window.sessionjs.login();
+	            }
+	        }
+	        return '';
+	    }
+
 	    var executeUdsAjaxCall = function executeUdsAjaxCall(url, httpMethod) {
 	        return new Promise(function (resolve, reject) {
 	            return $.ajax($.extend({}, baseAjaxParams, {
 	                url: url,
 	                type: httpMethod,
 	                method: httpMethod,
+	                beforeSend: function beforeSend(xhr) {
+	                    if (getToken() !== '') {
+	                        xhr.setRequestHeader('Authorization', 'Bearer ' + getToken());
+	                    }
+	                },
 	                success: function success(response, status, xhr) {
 	                    return resolve(xhr.status === 204 ? null : response);
 	                },
-	                error: function error(xhr, status) {
+	                error: function error(xhr, status, errorThrown) {
 	                    return reject(xhr);
 	                }
 	            }));
 	        });
 	        return Promise.resolve();
+	    };
+
+	    var executeUdsAjaxCallWithJwt = function executeUdsAjaxCallWithJwt(url, httpMethod) {
+	        return new Promise(function (resolve, reject) {
+	            if (isTokenExpired()) {
+	                return forceTokenRefresh().success(function () {
+	                    executeUdsAjaxCall(url, httpMethod).then(function (response) {
+	                        return resolve(response);
+	                    }).catch(function (error) {
+	                        return reject(error);
+	                    });
+	                }).error(function () {
+	                    // Even if there was an error updating the token, we still need to hit udsjs, which at this point would probably return the "JWT expired" though this edge case is very unlikely.
+	                    console.warn('Udsjs unable to force an update of the JWT token.');
+	                    executeUdsAjaxCall(url, httpMethod).then(function (response) {
+	                        return resolve(response);
+	                    }).catch(function (error) {
+	                        return reject(error);
+	                    });
+	                });
+	            } else {
+	                // Else we have a valid token and continue as always.
+	                executeUdsAjaxCall(url, httpMethod).then(function (response) {
+	                    return resolve(response);
+	                }).catch(function (error) {
+	                    return reject(error);
+	                });
+	            }
+	        });
 	    };
 
 	    var executeUdsAjaxCallUnAuthed = function executeUdsAjaxCallUnAuthed(url, httpMethod) {
@@ -251,6 +307,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                contentType: 'application/json',
 	                type: httpMethod,
 	                method: httpMethod,
+	                beforeSend: function beforeSend(xhr) {
+	                    // xhr.setRequestHeader('X-Omit', 'WWW-Authenticate');
+	                    if (window.sessionjs && window.sessionjs.isAuthenticated() && window.sessionjs._state.keycloak.token) {
+	                        xhr.setRequestHeader('Authorization', 'Bearer ' + window.sessionjs._state.keycloak.token);
+	                    }
+	                },
 	                dataType: dataType || '',
 	                success: function success(response, status, xhr) {
 	                    return resolve(xhr.status === 204 ? null : response);
@@ -262,36 +324,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    };
 
+	    var executeUdsAjaxCallWithDataWithJwt = function executeUdsAjaxCallWithDataWithJwt(url, data, httpMethod, dataType) {
+	        return new Promise(function (resolve, reject) {
+	            if (isTokenExpired()) {
+	                return forceTokenRefresh().success(function () {
+	                    executeUdsAjaxCallWithData(url, data, httpMethod, dataType).then(function (response) {
+	                        return resolve(response);
+	                    }).catch(function (error) {
+	                        return reject(error);
+	                    });
+	                }).error(function () {
+	                    // Even if there was an error updating the token, we still need to hit udsjs, which at this point would probably return the "JWT expired" though this edge case is very unlikely.
+	                    console.warn('Udsjs unable to force an update of the JWT token.');
+	                    executeUdsAjaxCallWithData(url, data, httpMethod, dataType).then(function (response) {
+	                        return resolve(response);
+	                    }).catch(function (error) {
+	                        return reject(error);
+	                    });
+	                });
+	            } else {
+	                // Else we have a valid token and continue as always.
+	                executeUdsAjaxCallWithData(url, data, httpMethod, dataType).then(function (response) {
+	                    return resolve(response);
+	                }).catch(function (error) {
+	                    return reject(error);
+	                });
+	            }
+	        });
+	    };
+
 	    function fetchCaseDetails(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCaseComments(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchComments(uql) {
 	        var url = udsHostName.clone().setPath('/case/comments').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCaseAssociateDetails(uql) {
 	        var url = udsHostName.clone().setPath('/case/associates').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    //hold the lock on the case
 	    function getlock(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/lock");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    //release the lock on the case
 	    function releaselock(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/lock");
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function fetchAccountDetails(accountNumber, resourceProjection) {
@@ -302,17 +393,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            url.addQueryParam('resourceProjection', 'Minimal');
 	        }
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchAccountNotes(accountNumber) {
 	        var url = udsHostName.clone().setPath('/account/' + accountNumber + '/notes');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchUserDetails(ssoUsername) {
 	        var url = udsHostName.clone().setPath('/user/') + ssoUsername;
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchUser(userUql, resourceProjection) {
@@ -320,7 +411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (resourceProjection != null) {
 	            url.addQueryParam('resourceProjection', resourceProjection);
 	        }
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCases(uql, resourceProjection, limit, sortOption, statusOnly, nepUql) {
@@ -343,12 +434,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (sortOption != null) {
 	            url.addQueryParam('orderBy', sortOption);
 	        }
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function generateBomgarSessionKey(caseId) {
 	        var url = udsHostName.clone().setPath('/case/' + caseId + '/remote-session-key');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function postPublicComments(caseNumber, caseComment, doNotChangeSbt, hoursWorked) {
@@ -359,7 +450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (doNotChangeSbt) {
 	            url.addQueryParam('doNotChangeSbt', doNotChangeSbt);
 	        }
-	        return executeUdsAjaxCallWithData(url, caseComment, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, caseComment, 'POST');
 	    }
 
 	    function postPrivateComments(caseNumber, caseComment, hoursWorked) {
@@ -369,38 +460,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/private/hoursWorked/" + hoursWorked);
 	        }
-	        return executeUdsAjaxCallWithData(url, caseComment, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, caseComment, 'POST');
 	    }
 
 	    function updateCaseDetails(caseNumber, caseDetails) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber);
-	        return executeUdsAjaxCallWithData(url, caseDetails, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, caseDetails, 'PUT');
 	    }
 
 	    function updateCaseOwner(caseNumber, ownerSSO) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/owner/' + ownerSSO);
-	        return executeUdsAjaxCall(url, 'PUT');
+	        return executeUdsAjaxCallWithJwt(url, 'PUT');
 	    }
 
 	    function fetchCaseHistory(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/history");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getCQIQuestions(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews/questions');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    // Allows for UQL for fetching CQIs
 	    function getCQIs(uql) {
 	        var url = udsHostName.clone().setPath('/case/reviews').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function postCQIScore(caseNumber, reviewData) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/reviews');
-	        return executeUdsAjaxCallWithData(url, reviewData, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, reviewData, 'POST');
 	    }
 
 	    function getSolutionDetails(solutionNumber, resourceProjection) {
@@ -408,35 +499,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (resourceProjection !== undefined) {
 	            url.addQueryParam('resourceProjection', resourceProjection);
 	        }
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getSQIQuestions(solutionNumber) {
 	        var url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber + '/reviews/questions');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    // Allows for UQL for fetching SQIs
 	    function getSQIs(uql) {
 	        var url = udsHostName.clone().setPath('/documentation/solution/reviews').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function postSQIScore(solutionNumber, reviewData) {
 	        var url = udsHostName.clone().setPath('/documentation/solution/' + solutionNumber + '/reviews');
-	        return executeUdsAjaxCallWithData(url, reviewData, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, reviewData, 'POST');
 	    }
 
 	    function getSbrList(resourceProjection, query) {
 	        var url = udsHostName.clone().setPath('/user/metadata/sbrs');
 	        url.addQueryParam('resourceProjection', resourceProjection);
 	        url.addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCaseSbrs() {
 	        var url = udsHostName.clone().setPath('/case/sbrs');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    // Unauthed sbrs
@@ -447,33 +538,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function pinSolutionToCase(caseNumber, solutionJson) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber);
-	        return executeUdsAjaxCallWithData(url, solutionJson, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, solutionJson, 'PUT');
 	    }
 
 	    function removeUserSbr(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/sbr').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function getRoleList(query) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles');
 	        url.addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getRoleDetails(roleId) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles/' + roleId);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function removeUserRole(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function updateUserRole(userId, role) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/role/' + role.externalModelId);
-	        return executeUdsAjaxCallWithData(url, role.resource, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, role.resource, 'PUT');
 	    }
 
 	    function postAddUsersToSBR(userId, uql, data) {
@@ -481,7 +572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw 'User Query is mandatory';
 	        }
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/sbr').addQueryParam('where', uql);
-	        return executeUdsAjaxCallWithData(url, data, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, data, 'POST');
 	    }
 
 	    function postAddUsersToRole(userId, uql, data) {
@@ -489,103 +580,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw 'User Query is mandatory';
 	        }
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/role').addQueryParam('where', uql);
-	        return executeUdsAjaxCallWithData(url, data, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, data, 'POST');
 	    }
 
 	    function getOpenCasesForAccount(uql) {
 	        var path = '/case';
 	        var url = udsHostName.clone().setPath(path).addQueryParam('where', uql);
 	        url.addQueryParam('resourceProjection', 'Minimal');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getCallLogsForCase(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/calls");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getQuestionDependencies() {
 	        var path = '/case/ktquestions';
 	        var url = udsHostName.clone().setPath(path);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function postRoleLevel(userId, roleName, roleLevel) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + "/role-level/" + roleName);
-	        return executeUdsAjaxCallWithData(url, roleLevel, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, roleLevel, 'PUT');
 	    }
 
 	    function postEditPrivateComments(caseNumber, caseComment, caseCommentId, draft) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/private");
 	        url.addQueryParam('draft', draft);
-	        return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, caseComment, 'PUT');
 	    }
 
 	    function postPvtToPubComments(caseNumber, caseComment, caseCommentId, draft) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/comments/" + caseCommentId + "/public");
 	        url.addQueryParam('draft', draft);
-	        return executeUdsAjaxCallWithData(url, caseComment, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, caseComment, 'PUT');
 	    }
 
 	    function createCaseNep(caseNumber, nep) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/nep");
-	        return executeUdsAjaxCallWithData(url, nep, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, nep, 'POST');
 	    }
 
 	    function updateCaseNep(caseNumber, nep) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/nep");
-	        return executeUdsAjaxCallWithData(url, nep, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, nep, 'PUT');
 	    }
 
 	    function removeCaseNep(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/nep");
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function getAvgCSATForAccount(uql) {
 	        var url = udsHostName.clone().setPath('/metrics/CsatAccountAvg').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getCaseContactsForAccount(accountNumber) {
 	        var url = udsHostName.clone().setPath('/account/' + accountNumber + "/contacts");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getCaseGroupsForContact(contactSSO) {
 	        var url = udsHostName.clone().setPath('/case/casegroups/user/' + contactSSO);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getRMECountForAccount(uql) {
 	        var url = udsHostName.clone().setPath('/case/history').addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function addAssociates(caseNumber, jsonAssociates) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
-	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, jsonAssociates, 'POST');
 	    }
 
 	    function deleteAssociates(caseNumber, jsonAssociates) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/associate");
-	        return executeUdsAjaxCallWithData(url, jsonAssociates, 'DELETE');
+	        return executeUdsAjaxCallWithDataWithJwt(url, jsonAssociates, 'DELETE');
 	    }
 
 	    function fetchSolutionDetails(solutionIdQuery) {
 	        var url = udsHostName.clone().setPath('/documentation/solution').addQueryParam('where', solutionIdQuery);
 	        url.addQueryParam('resourceProjection', 'Minimal');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function setHandlingSystem(caseNumber, handlingSystemArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/handlingsystems");
-	        return executeUdsAjaxCallWithData(url, handlingSystemArray, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, handlingSystemArray, 'PUT');
 	    }
 
 	    function fetchKCSFromDrupal(id) {
 	        var url = udsHostName.clone().setPath('/documentation/drupalapi/' + id);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchSolr(query) {
@@ -610,7 +701,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            url.addQueryParam('fl', query.fl);
 	        }
 
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCaseSolr(query) {
@@ -635,182 +726,182 @@ return /******/ (function(modules) { // webpackBootstrap
 	            url.addQueryParam('fl', query.fl);
 	        }
 
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function addCaseSbrs(caseNumber, sbrArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/sbrs");
-	        return executeUdsAjaxCallWithData(url, sbrArray, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, sbrArray, 'PUT');
 	    }
 
 	    function removeCaseSbrs(caseNumber, sbrArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/sbrs");
-	        return executeUdsAjaxCallWithData(url, sbrArray, 'DELETE');
+	        return executeUdsAjaxCallWithDataWithJwt(url, sbrArray, 'DELETE');
 	    }
 
 	    function getAllRolesList(query) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles/query');
 	        url.addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function createRole(roleDetails) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles/add');
-	        return executeUdsAjaxCallWithData(url, roleDetails, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, roleDetails, 'POST');
 	    }
 
 	    function updateRole(roleId, rolePayload) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles/' + roleId);
-	        return executeUdsAjaxCallWithData(url, rolePayload, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, rolePayload, 'PUT');
 	    }
 
 	    function deleteRole(roleId) {
 	        var url = udsHostName.clone().setPath('/user/metadata/roles/' + roleId);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function getAdditionalContacts(caseNumber) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/contacts");
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function removeAdditionalContacts(caseNumber, contacts) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/contacts");
-	        return executeUdsAjaxCallWithData(url, contacts, 'DELETE');
+	        return executeUdsAjaxCallWithDataWithJwt(url, contacts, 'DELETE');
 	    }
 
 	    function addAdditionalContacts(caseNumber, contacts) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/contacts");
-	        return executeUdsAjaxCallWithData(url, contacts, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, contacts, 'PUT');
 	    }
 
 	    function getBrmsResponse(jsonObject) {
 	        var url = udsHostName.clone().setPath('/brms');
-	        return executeUdsAjaxCallWithData(url, jsonObject, 'POST', 'text');
+	        return executeUdsAjaxCallWithDataWithJwt(url, jsonObject, 'POST', 'text');
 	    }
 
 	    function fetchTopCasesFromSolr(queryString) {
 	        var url = udsHostName.clone().setPath('/solr?' + queryString);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getUserDetailsFromSFDC(userID) {
 	        var url = udsHostName.clone().setPath('/salesforce/user/' + userID);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function updateUserDetailsInSFDC(ssoUsername, data) {
 	        var url = udsHostName.clone().setPath('/user/salesforce/' + ssoUsername);
-	        return executeUdsAjaxCallWithData(url, data, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, data, 'PUT');
 	    }
 
 	    function getCallCenterFromSFDC(callCenterId) {
 	        var url = udsHostName.clone().setPath('/callcenter/' + callCenterId);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function getCaseTagsList() {
 	        var url = udsHostName.clone().setPath('/case/tags');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function addCaseTags(caseNumber, tagsArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
-	        return executeUdsAjaxCallWithData(url, tagsArray, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, tagsArray, 'PUT');
 	    }
 
 	    function removeCaseTags(caseNumber, tagsArray) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + "/tags");
-	        return executeUdsAjaxCallWithData(url, tagsArray, 'DELETE');
+	        return executeUdsAjaxCallWithDataWithJwt(url, tagsArray, 'DELETE');
 	    }
 
 	    function fetchPriorityTemplates(uql) {
 	        var url = udsHostName.clone().setPath('/user/metadata/templates');
 	        url.addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchCaseLanguages() {
 	        var url = udsHostName.clone().setPath('/case/languages');
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchBugzillas(uql) {
 	        var url = udsHostName.clone().setPath('/bug');
 	        url.addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function fetchBugzillaComments(uql) {
 	        var url = udsHostName.clone().setPath('/bug/comments');
 	        url.addQueryParam('where', uql);
-	        return executeUdsAjaxCall(url, 'GET');
+	        return executeUdsAjaxCallWithJwt(url, 'GET');
 	    }
 
 	    function addLanguageToUser(userId, language, type) {
 	        if (type !== "primary" && type !== "secondary") type = "primary";
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/language/' + type + '/' + language);
-	        return executeUdsAjaxCall(url, 'POST');
+	        return executeUdsAjaxCallWithJwt(url, 'POST');
 	    }
 
 	    function removeLanguagesFromUser(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/language').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function addTagToUser(userId, tagName) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/tag/' + tagName);
-	        return executeUdsAjaxCall(url, 'POST');
+	        return executeUdsAjaxCallWithJwt(url, 'POST');
 	    }
 
 	    function removeTagsFromUser(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/tag').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function addUserAsQB(qbUserId, userId) {
 	        var url = udsHostName.clone().setPath('/user/' + qbUserId + '/queuebuddy/' + userId);
-	        return executeUdsAjaxCall(url, 'POST');
+	        return executeUdsAjaxCallWithJwt(url, 'POST');
 	    }
 
 	    function removeUserQBs(qbUserId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + qbUserId + '/queuebuddy').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function addNNOToUser(userId, nnoRegion) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion/' + nnoRegion);
-	        return executeUdsAjaxCall(url, 'POST');
+	        return executeUdsAjaxCallWithJwt(url, 'POST');
 	    }
 
 	    function removeNNOsFromUser(userId, query) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nnoregion').addQueryParam('where', query);
-	        return executeUdsAjaxCall(url, 'DELETE');
+	        return executeUdsAjaxCallWithJwt(url, 'DELETE');
 	    }
 
 	    function setGbdSuperRegion(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/virtualoffice/' + value);
-	        return executeUdsAjaxCall(url, 'PUT');
+	        return executeUdsAjaxCallWithJwt(url, 'PUT');
 	    }
 
 	    function setOutOfOfficeflag(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/out-of-office');
-	        return executeUdsAjaxCallWithData(url, value, 'POST');
+	        return executeUdsAjaxCallWithDataWithJwt(url, value, 'POST');
 	    }
 
 	    function updateResourceLink(caseNumber, resourceLink) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/resourcelink');
-	        return executeUdsAjaxCallWithData(url, resourceLink, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, resourceLink, 'PUT');
 	    }
 
 	    function updateNightShiftForUser(userId, value) {
 	        var url = udsHostName.clone().setPath('/user/' + userId + '/nightshift/' + value);
-	        return executeUdsAjaxCall(url, 'PUT');
+	        return executeUdsAjaxCallWithJwt(url, 'PUT');
 	    }
 
 	    function updateCaseAttachment(caseNumber, attachmentId, attachmentDetails) {
 	        var url = udsHostName.clone().setPath('/case/' + caseNumber + '/attachment/' + attachmentId);
-	        return executeUdsAjaxCallWithData(url, attachmentDetails, 'PUT');
+	        return executeUdsAjaxCallWithDataWithJwt(url, attachmentDetails, 'PUT');
 	    }
 	});
 
