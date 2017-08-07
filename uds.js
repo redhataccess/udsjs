@@ -59,12 +59,10 @@ function forceTokenRefresh() {
 function getToken() {
     if (window.sessionjs && window.sessionjs._state.keycloak.token) {
         if (window.sessionjs.isAuthenticated()) {
-            return `Bearer ${window.sessionjs._state.keycloak.token}`;
-        } else {
-            window.sessionjs.login();
+            return window.sessionjs._state.keycloak.token;
         }
     }
-    return '';
+    return null;
 }
 
 const executeUdsAjaxCall = function (url, httpMethod) {
@@ -74,8 +72,10 @@ const executeUdsAjaxCall = function (url, httpMethod) {
             type: httpMethod,
             method: httpMethod,
             beforeSend: function(xhr) {
-                if(getToken() !== '') {
+                if(getToken()) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + getToken());
+                } else {
+                    console.warn(`Could not set JWT token on request, unauthenticated.`);
                 }
             },
             success: (response, status, xhr) => resolve(xhr.status === 204 ? null : response),
