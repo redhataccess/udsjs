@@ -220,12 +220,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function getToken() {
 	        if (window.sessionjs && window.sessionjs._state.keycloak.token) {
 	            if (window.sessionjs.isAuthenticated()) {
-	                return 'Bearer ' + window.sessionjs._state.keycloak.token;
-	            } else {
-	                window.sessionjs.login();
+	                return window.sessionjs._state.keycloak.token;
 	            }
 	        }
-	        return '';
+	        return null;
 	    }
 
 	    var executeUdsAjaxCall = function executeUdsAjaxCall(url, httpMethod) {
@@ -235,8 +233,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                type: httpMethod,
 	                method: httpMethod,
 	                beforeSend: function beforeSend(xhr) {
-	                    if (getToken() !== '') {
+	                    if (getToken()) {
 	                        xhr.setRequestHeader('Authorization', 'Bearer ' + getToken());
+	                    } else {
+	                        console.warn('Could not set JWT token on request, unauthenticated.');
 	                    }
 	                },
 	                success: function success(response, status, xhr) {
