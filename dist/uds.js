@@ -243,34 +243,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return resolve(xhr.status === 204 ? null : response);
 	                },
 	                error: function error(xhr, status, errorThrown) {
-	                    if (errorThrown) {
-	                        try {
-	                            // The JWT expired should be rare, if it happens, we need to log out as much information as possible to sentry
-	                            if (errorThrown && errorThrown.indexOf('JWT expired') !== -1) {
-	                                if (typeof window.Raven !== 'undefined') {
-	                                    var currentDate = new Date();
-	                                    var jwtInfo = {};
-	                                    if (window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak) {
-	                                        jwtInfo.isSessionjsInitialized = window.sessionjs._state.initialized;
-	                                        jwtInfo.encodedToken = window.sessionjs.sessionjs.getEncodedToken();
-	                                        jwtInfo.isAuthenticated = window.sessionjs.sessionjs.isAuthenticated();
-	                                        jwtInfo.token = window.sessionjs.sessionjs.getToken();
-	                                        jwtInfo.userInfo = window.sessionjs.sessionjs.getUserInfo();
-	                                        jwtInfo.keycloakIsTokenExpired = window.sessionjs._state.keycloak.isTokenExpired();
-	                                    }
-	                                    Raven.captureException(parsedError, {
-	                                        extra: {
-	                                            detailMessage: parsedError.detailMessage,
-	                                            currentDate: currentDate.toISOString(),
-	                                            currentDateLocale: currentDate.toLocaleString(),
-	                                            currentDateMs: +currentDate,
-	                                            jwtInfo: jwtInfo
-	                                        }
-	                                    });
-	                                }
-	                            }
-	                        } catch (je) {}
-	                    }
 	                    reject(xhr);
 	                }
 	            }));
