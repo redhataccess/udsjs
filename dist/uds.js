@@ -206,15 +206,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dataType: ''
 	    };
 
-	    // If the token is expiring within 5 seconds, go ahead and refresh it.  Using 5 seconds as that is what keycloak uses as the default minValidity
+	    // If the token is expiring within 60 seconds, go ahead and refresh it.  Using 60 seconds considering jwt.js checks if
+	    // the token needs to be refreshed every 60 seconds with a TTE of 90 seconds.  So 60 seconds guarantees that
+	    // we are at the boundary of what jwt.js does without overlapping a great deal
 	    function isTokenExpired() {
-	        return window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(5) === true;
+	        return window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(60) === true;
 	    }
 
 	    function forceTokenRefresh() {
 	        console.warn('Udsjs detected the JWT token has expired, forcing an update');
-	        // -1 here forces the token to refresh
-	        return window.sessionjs._state.keycloak.updateToken(-1);
+	        // updateToken(true) forces the token to update by passing -1 to keycloak.updateToken
+	        return window.sessionjs.updateToken(true);
 	    }
 
 	    function getToken() {
@@ -253,7 +255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var executeUdsAjaxCallWithJwt = function executeUdsAjaxCallWithJwt(url, httpMethod) {
 	        return new Promise(function (resolve, reject) {
 	            if (isTokenExpired()) {
-	                return forceTokenRefresh().success(function () {
+	                forceTokenRefresh().success(function () {
 	                    executeUdsAjaxCall(url, httpMethod).then(function (response) {
 	                        return resolve(response);
 	                    }).catch(function (error) {
@@ -327,7 +329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var executeUdsAjaxCallWithDataWithJwt = function executeUdsAjaxCallWithDataWithJwt(url, data, httpMethod, dataType) {
 	        return new Promise(function (resolve, reject) {
 	            if (isTokenExpired()) {
-	                return forceTokenRefresh().success(function () {
+	                forceTokenRefresh().success(function () {
 	                    executeUdsAjaxCallWithData(url, data, httpMethod, dataType).then(function (response) {
 	                        return resolve(response);
 	                    }).catch(function (error) {

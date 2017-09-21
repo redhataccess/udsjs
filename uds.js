@@ -45,15 +45,17 @@ const baseAjaxParams = {
     dataType: ''
 };
 
-// If the token is expiring within 5 seconds, go ahead and refresh it.  Using 5 seconds as that is what keycloak uses as the default minValidity
+// If the token is expiring within 60 seconds, go ahead and refresh it.  Using 60 seconds considering jwt.js checks if
+// the token needs to be refreshed every 60 seconds with a TTE of 90 seconds.  So 60 seconds guarantees that
+// we are at the boundary of what jwt.js does without overlapping a great deal
 function isTokenExpired() {
-    return (window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(5) === true);
+    return (window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(60) === true);
 }
 
 function forceTokenRefresh() {
     console.warn(`Udsjs detected the JWT token has expired, forcing an update`);
-    // -1 here forces the token to refresh
-    return window.sessionjs._state.keycloak.updateToken(-1);
+    // updateToken(true) forces the token to update by passing -1 to keycloak.updateToken
+    return window.sessionjs.updateToken(true);
 }
 
 function getToken() {
@@ -89,7 +91,7 @@ const executeUdsAjaxCall = function (url, httpMethod) {
 const executeUdsAjaxCallWithJwt = function (url, httpMethod) {
     return new Promise((resolve, reject) => {
         if (isTokenExpired()) {
-            return forceTokenRefresh().success(() => {
+            forceTokenRefresh().success(() => {
                 executeUdsAjaxCall(url, httpMethod).then((response) => resolve(response)).catch((error) => reject(error));
             }).error(() => {
                 // Even if there was an error updating the token, we still need to hit udsjs, which at this point would probably return the "JWT expired" though this edge case is very unlikely.
@@ -141,7 +143,7 @@ const executeUdsAjaxCallWithData = function (url, data, httpMethod, dataType) {
 const executeUdsAjaxCallWithDataWithJwt = function (url, data, httpMethod, dataType) {
     return new Promise((resolve, reject) => {
         if (isTokenExpired()) {
-            return forceTokenRefresh().success(() => {
+            forceTokenRefresh().success(() => {
                 executeUdsAjaxCallWithData(url, data, httpMethod, dataType).then((response) => resolve(response)).catch((error) => reject(error));
             }).error(() => {
                 // Even if there was an error updating the token, we still need to hit udsjs, which at this point would probably return the "JWT expired" though this edge case is very unlikely.
