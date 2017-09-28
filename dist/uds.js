@@ -210,7 +210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // the token needs to be refreshed every 60 seconds with a TTE of 90 seconds.  So 60 seconds guarantees that
 	    // we are at the boundary of what jwt.js does without overlapping a great deal
 	    function isTokenExpired() {
-	        return window.sessionjs && window.sessionjs._state && window.sessionjs._state.keycloak && window.sessionjs._state.keycloak.isTokenExpired(60) === true;
+	        return window.sessionjs && window.sessionjs.isTokenExpired();
 	    }
 
 	    function forceTokenRefresh() {
